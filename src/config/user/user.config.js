@@ -27,7 +27,7 @@ const ValidateUser = async (password, User) => {
                     expiresIn: "7 days",
                 }
             );
-            return { message: "Login Successfully", token };
+            return { message: "Login Successfully", token,role: User.role };
         } else {
             return { message: "Password is wrong" };
         }

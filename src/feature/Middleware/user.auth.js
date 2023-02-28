@@ -3,7 +3,7 @@ const userModel = require('../user/user.model')
 const SECRET_TOKEN = process.env.SECRET_TOKEN;
 
 const userPrivateRoute = async (req, res, next) => {
-
+console.log(req);
     let authToken;
     // here we are checking if headers include token if not then return from here itself
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) authToken = req.headers.authorization.split(" ")[1]
@@ -32,7 +32,6 @@ const userPrivateRoute = async (req, res, next) => {
 }
 
 const adminPrivateRoute = async (req, res, next) => {
-
     let authToken;
     // here we are checking if headers include token if not then return from here itself
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) authToken = req.headers.authorization.split(" ")[1]

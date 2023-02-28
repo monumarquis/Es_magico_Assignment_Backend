@@ -6,17 +6,34 @@ const { ValidateUser, UpdatedUser } = require("../../config/user/user.config");
 const { userPrivateRoute, adminPrivateRoute } = require('../Middleware/user.auth');
 
 
+// Search User by name 
+app.get("/Search/:user", adminPrivateRoute, async (req, res) => {
+    let { user } = req.params
+    let Users = await userModel.find()
+    if (!user) return res.status(200).send(Users)
+    try {
+        console.log(user)
+        const regex = new RegExp(user, 'i')
+        let AllUsers = await userModel.find({ name: { $regex: regex } })
+        return res.status(200).send(AllUsers)
+    }
+    catch (err) {
+        return res.status(404).send({ message: "Request Not Found" });
+    }
+})
+
 // All Users Profile route
 app.get('/', adminPrivateRoute, async (req, res) => {
-    const user = await userModel.find({ role: "user" });
+    const user = await userModel.find();
     return res.status(201).send(user)
 })
 
 // Admin can delete User route 
-app.delete('/', adminPrivateRoute, async (req, res) => {
-    const { userId } = req.body
+app.delete('/:userId', adminPrivateRoute, async (req, res) => {
+    const { userId } = req.params
     try {
         let doc = await userModel.findByIdAndDelete(userId)
+        console.log(doc)
         return res.status(201).send({ "message": "user deleted successfully" })
     } catch (error) {
         return res.status(500).send(error);
@@ -25,13 +42,13 @@ app.delete('/', adminPrivateRoute, async (req, res) => {
 
 // Admin can update user role section route
 app.patch('/', adminPrivateRoute, async (req, res) => {
-    const { userId ,role} = req.body
+    const { userId, role } = req.body
     const user = await userModel.findById(userId)
     console.log(user);
 
     // here I am creating update object with deafult value provided to ensure whole data get updated
     const update = {
-        role: role || user.role,
+        role: role,
     }
     try {
         // here I am getting response from a function that hold my all logic  
@@ -77,7 +94,7 @@ app.patch("/udpdateProfile", userPrivateRoute, async (req, res) => {
     }
 })
 
-// User register Routeoute
+// User register Route
 app.post('/register', async (req, res) => {
     const { name, email, password, role } = req.body
     if (!name || !email || !password || !role) return res.status(403).send({ message: "Please Enter All Credential" })
